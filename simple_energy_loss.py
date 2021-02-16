@@ -192,9 +192,9 @@ def P_g_t0(p):
     return np.power(p0*p0+p*p,-5.)
 
 # Momentum grid
-n_p=50
+n_p=20
 pmin=1
-pmax=30
+pmax=20
 p_list=np.linspace(pmin,pmax,n_p)
 
 log_P_g_init=np.log(P_g_t0(p_list))
@@ -244,7 +244,7 @@ def Pg_update(log_P_g_prev,T,dt):
 #exit(1)
 
 # Solve until out of the medium
-T_min_in_GeV=.2
+T_min_in_GeV=.15
 taumin=.4
 tau=taumin
 dtau=0.005
@@ -257,7 +257,8 @@ while (T_in_GeV>T_min_in_GeV):
     log_P_g=np.log(Pg_update(log_P_g_prev,T_in_GeV,dtau))
 
     # Adaptive dtau, such that d(temperature) remains roughly the same
-    dtau*=np.power((tau+dtau)/tau,1+1./3.)
+    dtau*=(tau+dtau)/tau
+    #dtau*=np.power((tau+dtau)/tau,1+1./3.)
     # Next timestep
     tau+=dtau 
     T_in_fm=ns_sol.integrate(tau)
