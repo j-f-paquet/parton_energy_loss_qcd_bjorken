@@ -6,6 +6,7 @@ import matplotlib.ticker as mtick
 import scipy #.optimize
 import scipy.interpolate
 import scipy.integrate
+#import scipy.integrate.simpson
 
 from eos import cs2_qcd_fct
 from style import font_choice, linewidth_choice
@@ -62,7 +63,7 @@ ns_sol=init_bjorken_ns_solver(T0_in_fm, tau0, cs2_fct, combined_visc_fct_param=c
 #################################################
 ############## Temperature profile ##############
 ##################################################
-#
+
 #tau_plot=10.
 #
 #plt.figure()
@@ -91,6 +92,8 @@ ns_sol=init_bjorken_ns_solver(T0_in_fm, tau0, cs2_fct, combined_visc_fct_param=c
 #plt.tight_layout()
 #plt.savefig("T_profile.pdf")
 #plt.show()
+#
+#exit(1)
 
 
 ######################################################
@@ -196,11 +199,6 @@ p_list=np.linspace(pmin,pmax,n_p)
 
 log_P_g_init=np.log(P_g_t0(p_list))
 
-
-print(p_list)
-#print(log_P_g_prev)
-print(np.exp(log_P_g_init))
-
 def Pg_update(log_P_g_prev,T,dt):
 
     P_g=np.zeros(n_p)
@@ -208,7 +206,7 @@ def Pg_update(log_P_g_prev,T,dt):
     for ip, p in enumerate(p_list):
 
         # Get interpolator for log_P_g_prev(p)
-        interp_log_P_g_prev=scipy.interpolate.interp1d(p_list,log_P_g_prev, fill_value=-1000, bounds_error=False)
+        interp_log_P_g_prev=scipy.interpolate.interp1d(p_list,log_P_g_prev,  kind='linear', fill_value='extrapolate') #fill_value=-1000, bounds_error=False)
 
         def P_g_prev(p):
             return np.exp(interp_log_P_g_prev(p))
@@ -216,31 +214,40 @@ def Pg_update(log_P_g_prev,T,dt):
         def integrand(omega):
 
             return P_g_prev(p+omega)*dGamma_domega_inel(p+omega, omega,T)-P_g_prev(p)*dGamma_domega_inel(p, omega,T)
-            #return -P_g_prev(p)*dGamma_domega_inel(p, omega,T)
-            #return dGamma_domega_inel(p, omega,T)
 
-        #print([integrand(omega) for omega in np.linspace(pmin,pmax,100)])
+        def integrand_middle(p,u):
+            return integrand(p*(1-u))+integrand(p*(1+u))
 
-        res=scipy.integrate.quad(integrand, pmin, pmax, limit=10000, epsabs=1e-10, epsrel=1e-3)
+        vec_integrand = np.vectorize(integrand)
 
-        #print(res)
+        npts=1000
+        epsabs=1e-30
+        epsrel=1e-3
 
-        #exit(1)
+        delta=0.2
+        if (p*(1-delta)<pmin)or(p*(1+delta)>pmax):
+            res_quad2a=scipy.integrate.quad(vec_integrand, pmin, p, limit=npts, epsabs=epsabs, epsrel=epsrel)
+            res_quad2c=scipy.integrate.quad(vec_integrand, p, pmax, limit=npts, epsabs=epsabs, epsrel=epsrel)
+            res=res_quad2a[0]+res_quad2c[0]
+        else:
+            res_quad2a=scipy.integrate.quad(vec_integrand, pmin, p*(1-delta), limit=npts, epsabs=epsabs, epsrel=epsrel)
+            res_quad2b=scipy.integrate.quad(lambda u, p=p: p*integrand_middle(p,u), 0, delta, limit=npts, epsabs=epsabs, epsrel=epsrel)
+            res_quad2c=scipy.integrate.quad(vec_integrand, p*(1+delta), pmax, limit=npts, epsabs=epsabs, epsrel=epsrel)
+            res=res_quad2a[0]+res_quad2b[0]+res_quad2c[0]
 
-        P_g[ip]=P_g_prev(p)+dt*res[0]
+        P_g[ip]=P_g_prev(p)+dt*res
 
     return P_g
 
 
-#print("updated!")
 #print(Pg_update(log_P_g_init,.3,.1))
-
+#exit(1)
 
 # Solve until out of the medium
-T_min_in_GeV=.150
+T_min_in_GeV=.2
 taumin=.4
 tau=taumin
-dtau=0.025
+dtau=0.005
 T_in_fm=ns_sol.integrate(tau)
 T_in_GeV=T_in_fm*hbarc
 log_P_g_prev=log_P_g_init
@@ -249,6 +256,8 @@ while (T_in_GeV>T_min_in_GeV):
     # Compute spectra at next timestep
     log_P_g=np.log(Pg_update(log_P_g_prev,T_in_GeV,dtau))
 
+    # Adaptive dtau, such that d(temperature) remains roughly the same
+    dtau*=np.power((tau+dtau)/tau,1+1./3.)
     # Next timestep
     tau+=dtau 
     T_in_fm=ns_sol.integrate(tau)
