@@ -7,8 +7,8 @@ import scipy #.optimize
 import scipy.interpolate
 import scipy.integrate
 
-from temperature_profile import init_brick_profile, init_Bjorken_hydro_profile
-from parton_emission_rates import init_energy_loss_rates
+from temperature_profile import brick_profile, Bjorken_hydro_profile
+from parton_emission_rates import energy_loss_rates
 
 
 hbarc=0.1973
@@ -21,8 +21,8 @@ hbarc=0.1973
 T0_in_GeV=.300
 tau0=0.4
 
-#T_brick_fct=init_brick_profile(T0_in_GeV)
-T_ns_fct=init_Bjorken_hydro_profile(tau0, T0_in_GeV)
+T_brick_fct=brick_profile(T0_in_GeV=T0_in_GeV)
+T_ns_fct=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
 
 
 ######################################################
@@ -36,11 +36,9 @@ alpha_s=0.1
 g_s=np.sqrt(4*np.pi*alpha_s)
 
 N_f=0
-N_c=3
 
 # Rate are functions of: p, omega, T
-energy_loss_rate=init_energy_loss_rates(alpha_s, N_f, N_c)
-
+energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f)
 
 ##############################################
 ############## Parton evolution ##############
@@ -75,7 +73,7 @@ def Pg_update(log_P_g_prev,T,dt):
 
         def integrand(omega):
 
-            return P_g_prev(p+omega)*energy_loss_rate(p+omega, omega,T)-P_g_prev(p)*energy_loss_rate(p, omega,T)
+            return P_g_prev(p+omega)*energy_loss_rate.total_rate(p+omega, omega,T)-P_g_prev(p)*energy_loss_rate.total_rate(p, omega,T)
 
         def integrand_middle(p,u):
             return integrand(p*(1-u))+integrand(p*(1+u))
@@ -110,7 +108,7 @@ T_min_in_GeV=.15
 taumin=.4
 tau=taumin
 dtau=0.005
-T_in_GeV=T_ns_fct(tau)
+T_in_GeV=T_ns_fct.get_T(tau)
 log_P_g_prev=log_P_g_init
 while (T_in_GeV>T_min_in_GeV):
 
@@ -122,7 +120,7 @@ while (T_in_GeV>T_min_in_GeV):
     #dtau*=np.power((tau+dtau)/tau,1+1./3.)
     # Next timestep
     tau+=dtau 
-    T_in_GeV=T_ns_fct(tau)
+    T_in_GeV=T_ns_fct.get_T(tau)
     log_P_g_prev=log_P_g
 
     print("RAA at tau=",tau," fm (T=",T_in_GeV," GeV)")  

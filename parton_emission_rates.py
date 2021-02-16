@@ -10,40 +10,36 @@ hbarc=0.1973
 ############## Parton energy loss rates ##############
 ######################################################
 
-def init_energy_loss_rates(alpha_s, N_f, N_c):
+class energy_loss_rates:
 
-    #g_s=2
-    #alpha_s=g_s**2/(4.*numpy.pi)
+    def __init__(self, alpha_s, N_f):
+        self.alpha_s = alpha_s
+        self.g_s = np.sqrt(4*np.pi*alpha_s)
+        self.N_f = N_f
+        self.N_c = 3
+        self.C_A = self.N_c
 
-    #alpha_s=0.1
-    g_s=np.sqrt(4*np.pi*alpha_s)
+    def m_D(self, T):
 
-    #N_f=0
-
-    #N_c=3
-    C_A=N_c
-
-    def m_D(T):
-
-        return g_s*T*np.sqrt((N_c/3.+N_f/6))
+        return self.g_s*T*np.sqrt((self.N_c/3.+self.N_f/6))
 
     # For gluons
-    def qhat_eff(omega,T):
+    def qhat_eff(self, omega,T):
 
         # Solution of qhat_eff = q_soft^22(mu_T) with mu_T^2=C0 Sqrt(2 omega qhat_eff)
         # with C_0=2 e^{2-\gamma +\frac{\pi }{4}}
         # and q_soft^22(mu_T)=norm Log(mu_T^2/m_D^2)
         # with norm=alpha_s*C_A*T*m_D(T)**2
 
-        norm=alpha_s*C_A*T*m_D(T)**2
+        norm=self.alpha_s*self.C_A*T*self.m_D(T)**2
 
         C_0=18.1983
 
-        return -0.5*norm*np.real(scipy.special.lambertw(-m_D(T)**4/(norm*C_0**2*omega),k=-1))
+        return -0.5*norm*np.real(scipy.special.lambertw(-self.m_D(T)**4/(norm*C_0**2*omega),k=-1))
     #print(qhat_eff(1e-2*1000,.3))
     # should be about 0.052 with N_f=0 and alpha_s=0.1
 
-    def dGamma_domega_inel(p, omega,T):
+    def dGamma_domega_inel(self, p, omega,T):
 
         if (p == 0)or(omega>=p):
             res=0.0
@@ -52,16 +48,17 @@ def init_energy_loss_rates(alpha_s, N_f, N_c):
 
             z=omega/p
 
-            qhat_eff_val=qhat_eff(omega,T)
+            qhat_eff_val=self.qhat_eff(omega,T)
             #qhat_eff_val=0.04 #qhat_eff(1e-2*p,T)
             #print(qhat_eff_val)
 
-            res=alpha_s*N_c/(np.pi*p)*np.power(z*(1-z),-3./2.)*np.sqrt(qhat_eff_val/p)
+            res=self.alpha_s*self.N_c/(np.pi*p)*np.power(z*(1-z),-3./2.)*np.sqrt(qhat_eff_val/p)
 
         return res
 
 
-    return lambda p, omega, T : dGamma_domega_inel(p,omega,T)
+    def total_rate(self, p,omega,T):
+        return self.dGamma_domega_inel(p,omega,T)
 
 
 #plt.figure()
