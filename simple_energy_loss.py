@@ -12,6 +12,8 @@ from eos import cs2_qcd_fct
 from style import font_choice, linewidth_choice
 from bjorken_ns_solver import init_bjorken_ns_solver, approx_effective_viscosity_ns, better_effective_viscosity_ns
 
+#import cProfile
+
 hbarc=0.1973
 
 # Speed of sound (EOS)
@@ -127,9 +129,7 @@ def qhat_eff(omega,T):
 
     C_0=18.1983
 
-    return -0.5*norm*scipy.special.lambertw(-m_D(T)**4/(norm*C_0**2*omega),k=-1)
-
-
+    return -0.5*norm*np.real(scipy.special.lambertw(-m_D(T)**4/(norm*C_0**2*omega),k=-1))
 #print(qhat_eff(1e-2*1000,.3))
 # should be about 0.052 with N_f=0 and alpha_s=0.1
 
@@ -142,8 +142,8 @@ def dGamma_domega_inel(p, omega,T):
 
         z=omega/p
 
-        #qhat_eff=qhat_eff(omega,T)
-        qhat_eff_val=0.04 #qhat_eff(1e-2*p,T)
+        qhat_eff_val=qhat_eff(omega,T)
+        #qhat_eff_val=0.04 #qhat_eff(1e-2*p,T)
         #print(qhat_eff_val)
 
         res=alpha_s*N_c/(np.pi*p)*np.power(z*(1-z),-3./2.)*np.sqrt(qhat_eff_val/p)
