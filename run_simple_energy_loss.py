@@ -34,9 +34,9 @@ def run_simulation(design_matrix):
         params=params.flatten()
 
         param_dict={
-        'T0_in_GeV':params[0]/hbarc,
+        'T0_in_GeV':params[0],
         'tau0':params[1],
-        'T_final_in_GeV':params[2]/hbarc,
+        'T_final_in_GeV':params[2],
         'alpha_s':params[3],
         'N_f':0, #params[4],
         'RAA_pT_binnings':np.linspace(1,20,20)
