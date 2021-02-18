@@ -26,8 +26,7 @@ class Bjorken_hydro_profile:
     def __init__(self, T0_in_GeV, tau0):
         self.T0_in_GeV = T0_in_GeV
         self.tau0 = tau0
-        T0_in_fm=T0_in_GeV/hbarc
-        self.ns_sol = init_bjorken_ns_solver(T0_in_fm, self.tau0, self.cs2_fct, combined_visc_fct_param=self.combined_visc_fct)
+        self.T0_in_fm=T0_in_GeV/hbarc
 
     # Speed of sound (EOS)
     def cs2_fct(self, T_in_fm):
@@ -60,7 +59,8 @@ class Bjorken_hydro_profile:
         return (4./3.*eta_over_s+zeta_over_s)
 
     def get_T(self, tau):
-        return hbarc*self.ns_sol.integrate(tau)
+        ns_sol = init_bjorken_ns_solver(self.T0_in_fm, self.tau0, self.cs2_fct, self.combined_visc_fct)
+        return hbarc*ns_sol.integrate(tau)
 
 
 ###################################################
