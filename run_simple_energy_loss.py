@@ -89,6 +89,7 @@ def run_simulation(design_matrix):
         result=P_final/P_initial
         observations.append(result)
 
-    print(f'Shape of the result array is {result.shape}')
-    return result
+    observations=np.array(observations)
+    print(f'Shape of the result array is {observations.shape}')
+    return observations
 
