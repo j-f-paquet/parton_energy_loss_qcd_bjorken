@@ -18,10 +18,13 @@ class energy_loss_rates:
         self.N_f = N_f
         self.N_c = 3
         self.C_A = self.N_c
+        self.sqrt_Nc_Nf_factor=np.sqrt(self.N_c/3.+self.N_f/6)
 
     def m_D(self, T):
+        
+        factor=np.sqrt(self.N_c/3.+self.N_f/6)
 
-        return self.g_s*T*np.sqrt((self.N_c/3.+self.N_f/6))
+        return self.g_s*T*factor
 
     # For gluons
     def qhat_eff(self, omega,T):
@@ -31,11 +34,15 @@ class energy_loss_rates:
         # and q_soft^22(mu_T)=norm Log(mu_T^2/m_D^2)
         # with norm=alpha_s*C_A*T*m_D(T)**2
 
-        norm=self.alpha_s*self.C_A*T*self.m_D(T)**2
+        mD=self.m_D(T)
+        mD2=mD*mD
+        mD4=mD2*mD2
+
+        norm=self.alpha_s*self.C_A*T*mD2
 
         C_0=18.1983
 
-        return -0.5*norm*np.real(scipy.special.lambertw(-self.m_D(T)**4/(norm*C_0**2*omega),k=-1))
+        return -0.5*norm*np.real(scipy.special.lambertw(-mD4/(norm*C_0**2*omega),k=-1))
     #print(qhat_eff(1e-2*1000,.3))
     # should be about 0.052 with N_f=0 and alpha_s=0.1
 
@@ -46,13 +53,18 @@ class energy_loss_rates:
 
         else:
 
-            z=omega/p
+            one_over_p=1./p
+            one_over_pi=0.318309886183790671537767526745
+
+            #z=omega/p
+            z=one_over_p*omega
 
             qhat_eff_val=self.qhat_eff(omega,T)
             #qhat_eff_val=0.04 #qhat_eff(1e-2*p,T)
             #print(qhat_eff_val)
 
-            res=self.alpha_s*self.N_c/(np.pi*p)*np.power(z*(1-z),-3./2.)*np.sqrt(qhat_eff_val/p)
+            #res=self.alpha_s*self.N_c/(np.pi*p)*np.power(z*(1-z),-3./2.)*np.sqrt(qhat_eff_val/p)
+            res=self.alpha_s*self.N_c*one_over_p*one_over_pi*np.sqrt(qhat_eff_val*one_over_p/(z*z*z*(1-z)*(1-z)*(1-z))) 
 
         return res
 

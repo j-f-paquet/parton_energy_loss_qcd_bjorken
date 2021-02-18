@@ -9,7 +9,9 @@ import scipy.integrate
 
 from temperature_profile import brick_profile, Bjorken_hydro_profile
 from parton_emission_rates import energy_loss_rates
+from solver_euler import parton_evolution_solver_euler
 
+import time
 
 hbarc=0.1973
 
@@ -21,9 +23,8 @@ hbarc=0.1973
 T0_in_GeV=.300
 tau0=0.4
 
-T_brick_fct=brick_profile(T0_in_GeV=T0_in_GeV)
-T_ns_fct=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
-
+#T_profile=brick_profile(T0_in_GeV=T0_in_GeV)
+T_profile=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
 
 ######################################################
 ############## Parton energy loss rates ##############
@@ -31,97 +32,78 @@ T_ns_fct=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
 
 #g_s=2
 #alpha_s=g_s**2/(4.*numpy.pi)
-
 alpha_s=0.1
 g_s=np.sqrt(4*np.pi*alpha_s)
-
 N_f=0
-
-# Rate are functions of: p, omega, T
 energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f)
 
-##############################################
-############## Parton evolution ##############
-##############################################
+#######################################################
+############## Parton energy loss solver ##############
+#######################################################
 
 # Initial conditions 
-def P_g_t0(p):
+def P_g_tau0(p):
 
     p0=1.75
     
     return np.power(p0*p0+p*p,-5.)
 
-# Momentum grid
-n_p=20
-pmin=1
-pmax=20
-p_list=np.linspace(pmin,pmax,n_p)
+# Initialize and use the solver
+#parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
+#parton_evolution_solver2=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=40, pmin=1, pmax=20)
+#T_min_in_GeV=.25
+#dtau=0.005
+#P_final_fct1=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=False)
+#P_final_fct2=parton_evolution_solver2.evolve_to_min_temperature(dtau=dtau, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=False)
+##P_final2_fct=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau/2, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=False)
+#
+## Print and plot
+#
+## Compute some "RAA"-equivalent
+#p_list=np.linspace(1.,20,10) # Define some p_T bins
+#P_initial=P_g_tau0(p_list)
+#P_final1=P_final_fct1(p_list)
+#P_final2=P_final_fct2(p_list)
+#print('mock R_AA')
+#print('using 20 points in momentum to solve the parton evolution')
+#print(P_final1/P_initial)
+#print('using 40 points in momentum to solve the parton evolution')
+#print(P_final2/P_initial)
 
-log_P_g_init=np.log(P_g_t0(p_list))
-
-def Pg_update(log_P_g_prev,T,dt):
-
-    P_g=np.zeros(n_p)
-
-    for ip, p in enumerate(p_list):
-
-        # Get interpolator for log_P_g_prev(p)
-        interp_log_P_g_prev=scipy.interpolate.interp1d(p_list,log_P_g_prev,  kind='linear', fill_value='extrapolate') #fill_value=-1000, bounds_error=False)
-
-        def P_g_prev(p):
-            return np.exp(interp_log_P_g_prev(p))
-
-        def integrand(omega):
-
-            return P_g_prev(p+omega)*energy_loss_rate.total_rate(p+omega, omega,T)-P_g_prev(p)*energy_loss_rate.total_rate(p, omega,T)
-
-        def integrand_middle(p,u):
-            return integrand(p*(1-u))+integrand(p*(1+u))
-
-        vec_integrand = np.vectorize(integrand)
-
-        npts=1000
-        epsabs=1e-30
-        epsrel=1e-3
-
-        delta=0.2
-        if (p*(1-delta)<pmin)or(p*(1+delta)>pmax):
-            res_quad2a=scipy.integrate.quad(vec_integrand, pmin, p, limit=npts, epsabs=epsabs, epsrel=epsrel)
-            res_quad2c=scipy.integrate.quad(vec_integrand, p, pmax, limit=npts, epsabs=epsabs, epsrel=epsrel)
-            res=res_quad2a[0]+res_quad2c[0]
-        else:
-            res_quad2a=scipy.integrate.quad(vec_integrand, pmin, p*(1-delta), limit=npts, epsabs=epsabs, epsrel=epsrel)
-            res_quad2b=scipy.integrate.quad(lambda u, p=p: p*integrand_middle(p,u), 0, delta, limit=npts, epsabs=epsabs, epsrel=epsrel)
-            res_quad2c=scipy.integrate.quad(vec_integrand, p*(1+delta), pmax, limit=npts, epsabs=epsabs, epsrel=epsrel)
-            res=res_quad2a[0]+res_quad2b[0]+res_quad2c[0]
-
-        P_g[ip]=P_g_prev(p)+dt*res
-
-    return P_g
-
-
-#print(Pg_update(log_P_g_init,.3,.1))
-#exit(1)
-
-# Solve until out of the medium
 T_min_in_GeV=.15
-taumin=.4
-tau=taumin
-dtau=0.005
-T_in_GeV=T_ns_fct.get_T(tau)
-log_P_g_prev=log_P_g_init
-while (T_in_GeV>T_min_in_GeV):
+dtau=0.05
+dtau_adaptive=0.01
 
-    # Compute spectra at next timestep
-    log_P_g=np.log(Pg_update(log_P_g_prev,T_in_GeV,dtau))
+# Initialize and use the solver
+parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
+tic = time.perf_counter()
+P_final_fct1=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=False)
+toc = time.perf_counter()
+print(f"Fixed timestep: {toc - tic:0.4f} seconds")
+tic = time.perf_counter()
+P_final_fct2=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau_adaptive, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=True)
+toc = time.perf_counter()
+print(f"Adaptive timestep: {toc - tic:0.4f} seconds")
 
-    # Adaptive dtau, such that d(temperature) remains roughly the same
-    dtau*=(tau+dtau)/tau
-    #dtau*=np.power((tau+dtau)/tau,1+1./3.)
-    # Next timestep
-    tau+=dtau 
-    T_in_GeV=T_ns_fct.get_T(tau)
-    log_P_g_prev=log_P_g
+# Compute some "RAA"-equivalent
+p_list=np.linspace(1.,20,10) # Define some p_T bins
+P_initial=P_g_tau0(p_list)
+P_final1=P_final_fct1(p_list)
+P_final2=P_final_fct2(p_list)
+print('mock R_AA')
+print('using fixed timestep to solve the parton evolution')
+print(P_final1/P_initial)
+print('using adaptive timestep to solve the parton evolution')
+print(P_final2/P_initial)
 
-    print("RAA at tau=",tau," fm (T=",T_in_GeV," GeV)")  
-    print(np.exp(log_P_g)/np.exp(log_P_g_init))
+
+##print(zip(p_list,P_final,P_final/P_initial))
+##print([(p, P, R) for (p,P,R) in zip(p_list,P_final,P_final/P_initial)])
+#
+#p_list=np.linspace(1.,20,20) # Define some p_T bins
+#P_initial=P_g_tau0(p_list)
+#P_final=P_final_fct(p_list)
+#print('mock R_AA again')
+##print([(p, P, R) for (p,P,R) in zip(p_list,P_final,P_final/P_initial)])
+#print(P_final/P_initial)
+##print(P_final)
