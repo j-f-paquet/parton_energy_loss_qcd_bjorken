@@ -69,7 +69,7 @@ class energy_loss_rates:
         return res
 
 
-    def total_rate(self, p,omega,T):
+    def dGamma_domega(self, p,omega,T):
         return self.dGamma_domega_inel(p,omega,T)
 
 

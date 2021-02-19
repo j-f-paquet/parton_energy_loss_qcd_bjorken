@@ -38,7 +38,7 @@ class parton_evolution_solver_euler:
 
         P_g=np.zeros(self.num_p)
 
-        total_rate=self.energy_loss_rate.total_rate
+        dGamma_domega=self.energy_loss_rate.dGamma_domega
         pmin=self.pmin
         pmax=self.pmax
 
@@ -52,7 +52,7 @@ class parton_evolution_solver_euler:
 
             def integrand(omega):
 
-                return P_g_prev(p+omega)*total_rate(p+omega, omega,T)-P_g_prev(p)*total_rate(p, omega,T)
+                return P_g_prev(p+omega)*dGamma_domega(p+omega, omega,T)-P_g_prev(p)*dGamma_domega(p, omega,T)
 
             def integrand_middle(p,u):
                 return integrand(p*(1-u))+integrand(p*(1+u))
@@ -77,6 +77,41 @@ class parton_evolution_solver_euler:
             P_g[ip]=P_g_prev(p)+dt*res
 
         return P_g
+
+    # Returns an interpolation function with the results
+    def evolve_to_max_time(self,dtau, tau_max, use_adaptive_timestep=False):
+
+            T_profile=self.T_profile
+            p_list=self.p_list
+
+            tau=self.tau0
+            T_in_GeV=T_profile.get_T(tau)
+            log_P_g_prev=np.log(self.P_g_init)
+            while (tau<tau_max):
+
+                # Compute spectra at next timestep
+                log_P_g=np.log(self.evolve_parton_distrib_by_dtau(log_P_g_prev,T_in_GeV,dtau))
+
+                # Adaptive dtau, such that d(temperature) remains roughly the same
+                if (use_adaptive_timestep):
+                    dtau*=(tau+dtau)/tau
+                    #dtau*=np.power((tau+dtau)/tau,1+1./3.)
+                if (tau+dtau>tau_max):
+                    dtau=tau_max-tau
+
+                # Next timestep
+                tau+=dtau 
+                T_in_GeV=T_profile.get_T(tau)
+                log_P_g_prev=log_P_g
+
+                #print("RAA at tau=",tau," fm (T=",T_in_GeV," GeV)")  
+                #print(np.exp(log_P_g)/(self.P_g_init))
+
+            # Make interpolation function with the results
+            interp_log_P_g=scipy.interpolate.interp1d(p_list,log_P_g,  kind='cubic', bounds_error=True)
+                
+            return lambda p: np.exp(interp_log_P_g(p))
+
 
     # Returns an interpolation function with the results
     def evolve_to_min_temperature(self,dtau, T_min_in_GeV, use_adaptive_timestep=False):
