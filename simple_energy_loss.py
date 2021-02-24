@@ -10,6 +10,7 @@ import scipy.integrate
 from temperature_profile import brick_profile, Bjorken_hydro_profile
 from parton_emission_rates import energy_loss_rates
 from solver_euler import parton_evolution_solver_euler
+from solver_rk import parton_evolution_solver_rk45
 
 import time
 
@@ -76,6 +77,8 @@ dtau_adaptive=0.01
 
 # Initialize and use the solver
 parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
+parton_evolution_solver_rk=parton_evolution_solver_rk45(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
+
 tic = time.perf_counter()
 P_final_fct1=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=False)
 toc = time.perf_counter()
@@ -84,17 +87,24 @@ tic = time.perf_counter()
 P_final_fct2=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau_adaptive, T_min_in_GeV=T_min_in_GeV, use_adaptive_timestep=True)
 toc = time.perf_counter()
 print(f"Adaptive timestep: {toc - tic:0.4f} seconds")
+tic = time.perf_counter()
+P_final_fct3=parton_evolution_solver_rk.evolve_to_min_temperature(T_min_in_GeV=T_min_in_GeV)
+toc = time.perf_counter()
+print(f"RK: {toc - tic:0.4f} seconds")
 
 # Compute some "RAA"-equivalent
 p_list=np.linspace(1.,20,10) # Define some p_T bins
 P_initial=P_g_tau0(p_list)
 P_final1=P_final_fct1(p_list)
 P_final2=P_final_fct2(p_list)
+P_final3=P_final_fct3(p_list)
 print('mock R_AA')
 print('using fixed timestep to solve the parton evolution')
 print(P_final1/P_initial)
 print('using adaptive timestep to solve the parton evolution')
 print(P_final2/P_initial)
+print('using Runge-Kutta to solve the parton evolution')
+print(P_final3/P_initial)
 
 
 ##print(zip(p_list,P_final,P_final/P_initial))
