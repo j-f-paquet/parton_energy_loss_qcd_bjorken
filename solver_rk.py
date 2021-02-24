@@ -21,7 +21,7 @@ hbarc=0.1973
 # - evolve_to_min_temperature
 
 
-class parton_evolution_solver_rk45:
+class parton_evolution_solver_rk:
 
     def __init__(self, initial_condition_fct, tau0, T_profile, energy_loss_rate, num_p=20, pmin=1, pmax=20):
         self.init_cond_fct = initial_condition_fct
@@ -88,7 +88,7 @@ class parton_evolution_solver_rk45:
 
             tau=self.tau0
 
-            rk_obj=scipy.integrate.RK45(lambda t, y: self.rhs(t,y), self.tau0, self.P_g_init, tau_max)
+            rk_obj=scipy.integrate.RK23(lambda t, y: self.rhs(t,y), self.tau0, self.P_g_init, tau_max)
 
             while (rk_obj.t < tau_max):
                 rk_obj.step()
