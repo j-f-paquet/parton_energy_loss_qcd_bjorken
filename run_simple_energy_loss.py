@@ -15,12 +15,13 @@ from solver_rk import parton_evolution_solver_rk
 hbarc=0.1973
 
 
-def run_simulation(design_matrix):
+def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
     """Simulate energy loss of a jet for each design point
 
     parameters
     ----------
     see definition of "param_dict"
+    p_min, p_max, num_p_bins : Fix the momentem range and number of bins used for simulation
 
     Returns
     -------
@@ -76,9 +77,9 @@ def run_simulation(design_matrix):
 
 
         # Initialize and use the solver
-        num_p_solver=20
-        pmin_solver=1
-        pmax_solver=20
+        num_p_solver=num_p_bins
+        pmin_solver=p_min
+        pmax_solver=p_max
         #parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=num_p_solver, pmin=pmin_solver, pmax=pmax_solver)
         #P_final_fct=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau_adaptive, T_min_in_GeV=T_final_in_GeV, use_adaptive_timestep=True)
         parton_evolution_solver=parton_evolution_solver_rk(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=num_p_solver, pmin=pmin_solver, pmax=pmax_solver)
