@@ -12,19 +12,20 @@ hbarc=0.1973
 
 class energy_loss_rates:
 
-    def __init__(self, alpha_s, N_f):
+    def __init__(self, alpha_s, N_f, mD_factor=1):
         self.alpha_s = alpha_s
         self.g_s = np.sqrt(4*np.pi*alpha_s)
         self.N_f = N_f
         self.N_c = 3
         self.C_A = self.N_c
         self.sqrt_Nc_Nf_factor=np.sqrt(self.N_c/3.+self.N_f/6)
+        self.mD_factor=mD_factor
 
     def m_D(self, T):
         
         factor=np.sqrt(self.N_c/3.+self.N_f/6)
 
-        return self.g_s*T*factor
+        return self.mD_factor*self.g_s*T*factor
 
     # For gluons
     def qhat_eff(self, omega,T):

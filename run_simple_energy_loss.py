@@ -62,7 +62,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         ############## Parton energy loss rates ##############
         ######################################################
 
-        energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f)
+        energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, mD_factor=1)
 
         #######################################################
         ############## Parton energy loss solver ##############
