@@ -41,7 +41,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         'T_final_in_GeV':params[2],
         'alpha_s':params[3],
         'N_f':0, #params[4],
-        'RAA_pT_binnings':np.linspace(1,20,20)
+        'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins)
         }
 
         T0_in_GeV=param_dict['T0_in_GeV']
