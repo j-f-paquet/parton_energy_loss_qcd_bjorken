@@ -12,7 +12,7 @@ hbarc=0.1973
 
 class energy_loss_rates:
 
-    def __init__(self, alpha_s, N_f, mD_factor=1, K_factor_elastic=1, K_factor_inel=1):
+    def __init__(self, alpha_s, N_f, mD_factor=1, K_factor_fct_elastic=lambda T: 1, K_factor_fct_inel=lambda T: 1):
         self.alpha_s = alpha_s
         self.g_s = np.sqrt(4*np.pi*alpha_s)
         self.N_f = N_f
@@ -20,8 +20,8 @@ class energy_loss_rates:
         self.C_A = self.N_c
         self.sqrt_Nc_Nf_factor=np.sqrt(self.N_c/3.+self.N_f/6)
         self.mD_factor=mD_factor
-        self.K_factor_elastic=1
-        self.K_factor_inel=1
+        self.K_factor_fct_elastic=K_factor_fct_elastic
+        self.K_factor_fct_inel=K_factor_fct_inel
         
 
     def m_D(self, T):
@@ -78,7 +78,7 @@ class energy_loss_rates:
 
 
     def dGamma_domega(self, p,omega,T):
-        return self.K_factor_inel*self.dGamma_domega_inel(p,omega,T)+self.K_factor_elastic*self.dGamma_domega_elastic(p,omega,T)
+        return self.K_factor_fct_inel(T)*self.dGamma_domega_inel(p,omega,T)+self.K_factor_fct_elastic(T)*self.dGamma_domega_elastic(p,omega,T)
 
 
 #plt.figure()
