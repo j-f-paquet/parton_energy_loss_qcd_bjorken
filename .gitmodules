@@ -1,0 +1,3 @@
+[submodule "approxposterior"]
+	path = approxposterior
+	url = https://github.com/danOSU/approxposterior.git
