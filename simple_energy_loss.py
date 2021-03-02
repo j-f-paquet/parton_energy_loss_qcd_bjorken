@@ -39,10 +39,12 @@ g_s=np.sqrt(4*np.pi*alpha_s)
 N_f=0
 
 scale_inel=.2 #np.inf
+exponent_inel=2
 scale_el=.2
+exponent_el=2
 
-K_factor_fct_inel=lambda T, scale_inel=scale_inel : (1.+T/scale_inel)
-K_factor_fct_elastic=lambda T, scale_el=scale_el : (1.+T/scale_el)
+K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel : (1.+np.power(T/scale_inel,exponent_inel))
+K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el : (1.+np.power(T/scale_el,exponent_el))
 energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, K_factor_fct_inel=K_factor_fct_inel, K_factor_fct_elastic=K_factor_fct_elastic)
 
 #######################################################
