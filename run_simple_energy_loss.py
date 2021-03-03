@@ -21,26 +21,29 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
     parameters
     ----------
     see definition of "param_dict"
-    p_min, p_max, num_p_bins : Fix the momentem range and number of bins used for simulation
+    p_min, p_max, num_p_bins : Fix the momentem range and number of bins for R_AA calculations
 
     Returns
     -------
     numpy array
-        R_AA binned according to 'RAA_pT_binnings'
+        R_AA binned according to the momentem range speceifed at the input
 
     """
 
     observations = []
     for ii, params in enumerate(design_matrix):
-        print(f'Working on {ii}/{design_matrix.shape[0]} designs')
+        print(f'Working on {ii+1}/{design_matrix.shape[0]} design')
         params=params.flatten()
 
         param_dict={
-        'T0_in_GeV':params[0],
-        'tau0':params[1],
-        'T_final_in_GeV':params[2],
-        'alpha_s':params[3],
-        'N_f':0, #params[4],
+        'T0_in_GeV':0.3,
+        'tau0':0.2,
+        'T_final_in_GeV':0.15,
+        'alpha_s':params[0],
+        'N_f':0,
+        'mD_factor':params[1],
+        'exponent_inel':params[2],
+        'exponent_el':params[3],
         'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins)
         }
 
@@ -49,6 +52,9 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         T_final_in_GeV=param_dict['T_final_in_GeV']
         alpha_s=param_dict['alpha_s']
         N_f=param_dict['N_f']
+        mD_factor=param_dict['mD_factor']
+        exponent_inel=param_dict['exponent_inel']
+        exponent_el=param_dict['exponent_el']
         RAA_pT_binnings=param_dict['RAA_pT_binnings']
 
         #################################################
@@ -64,14 +70,12 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
 
         # The new parameters
         scale_inel=.2
-        exponent_inel=2
         scale_el=.2
-        exponent_el=2
 
         K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel : (1.+np.power(T/scale_inel,exponent_inel))
         K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el : (1.+np.power(T/scale_el,exponent_el))
 
-        energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, mD_factor=1, K_factor_fct_inel=K_factor_fct_inel, K_factor_fct_elastic=K_factor_fct_elastic)
+        energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, mD_factor=mD_factor, K_factor_fct_inel=K_factor_fct_inel, K_factor_fct_elastic=K_factor_fct_elastic)
 
         #######################################################
         ############## Parton energy loss solver ##############
@@ -101,6 +105,6 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         observations.append(result)
 
     observations=np.array(observations)
-    print(f'Shape of the result array is {observations.shape}')
+    #print(f'Shape of the result array is {observations.shape}')
     return observations
 
