@@ -34,14 +34,14 @@ T_profile=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
 
 #g_s=2
 #alpha_s=g_s**2/(4.*numpy.pi)
-alpha_s=0.1
+alpha_s=0.2
 g_s=np.sqrt(4*np.pi*alpha_s)
 N_f=0
 
 scale_inel=.2 #np.inf
-exponent_inel=2
+exponent_inel=-1
 scale_el=.2
-exponent_el=2
+exponent_el=1
 
 K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel : (1.+np.power(T/scale_inel,exponent_inel))
 K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el : (1.+np.power(T/scale_el,exponent_el))
