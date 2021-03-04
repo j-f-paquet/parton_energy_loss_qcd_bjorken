@@ -45,7 +45,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         'exponent_inel':params[1],
         'exponent_el':params[2],
         'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins),
-        'scale_inel':params[3]
+        'scale_inel':params[3],
         'scale_el':params[4]
         }
 
