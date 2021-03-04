@@ -41,10 +41,12 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         'T_final_in_GeV':0.15,
         'alpha_s':params[0],
         'N_f':0,
-        'mD_factor':params[1],
-        'exponent_inel':params[2],
-        'exponent_el':params[3],
-        'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins)
+        'mD_factor':0.5,
+        'exponent_inel':params[1],
+        'exponent_el':params[2],
+        'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins),
+        'scale_inel':params[3]
+        'scale_el':params[4]
         }
 
         T0_in_GeV=param_dict['T0_in_GeV']
@@ -56,6 +58,9 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         exponent_inel=param_dict['exponent_inel']
         exponent_el=param_dict['exponent_el']
         RAA_pT_binnings=param_dict['RAA_pT_binnings']
+        # The new parameters
+        scale_inel=param_dict['scale_inel']
+        scale_el=param_dict['scale_el']
 
         #################################################
         ############## Temperature profile ##############
@@ -68,9 +73,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         ############## Parton energy loss rates ##############
         ######################################################
 
-        # The new parameters
-        scale_inel=.2
-        scale_el=.2
+        
 
         K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel : (1.+np.power(T/scale_inel,exponent_inel))
         K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el : (1.+np.power(T/scale_el,exponent_el))
