@@ -11,7 +11,7 @@ from temperature_profile import brick_profile, Bjorken_hydro_profile
 from parton_emission_rates import energy_loss_rates
 from solver_euler import parton_evolution_solver_euler
 from solver_rk import parton_evolution_solver_rk
-from solver_rk8 import parton_evolution_solver_rk8
+#from solver_rk8 import parton_evolution_solver_rk8
 
 import time
 
@@ -87,7 +87,7 @@ dtau_adaptive=0.01
 # Initialize and use the solver
 #parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
 parton_evolution_solver_rk=parton_evolution_solver_rk(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
-parton_evolution_solver_rk8=parton_evolution_solver_rk8(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
+#parton_evolution_solver_rk8=parton_evolution_solver_rk8(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=20, pmin=1, pmax=20)
 
 tic = time.perf_counter()
 P_final_fct1=parton_evolution_solver_rk.evolve_to_min_temperature(T_min_in_GeV=T_min_in_GeV)
