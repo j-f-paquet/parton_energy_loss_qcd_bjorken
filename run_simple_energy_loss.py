@@ -12,6 +12,8 @@ from parton_emission_rates import energy_loss_rates
 from solver_euler import parton_evolution_solver_euler
 from solver_rk import parton_evolution_solver_rk
 
+import time
+
 hbarc=0.1973
 
 
@@ -29,10 +31,11 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         R_AA binned according to the momentem range speceifed at the input
 
     """
-
     observations = []
     for ii, params in enumerate(design_matrix):
         print(f'Working on {ii+1}/{design_matrix.shape[0]} design')
+        start_time = time.time()
+        
         params=params.flatten()
 
         param_dict={
@@ -105,9 +108,14 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         P_initial=P_g_tau0(RAA_pT_binnings)
         P_final=P_final_fct(RAA_pT_binnings)
         result=P_final/P_initial
+        end_time = time.time()
+        delta_t = end_time - start_time
+        
+        if  delta_t > 60 :
+            print(f'For model parameters {params} takes {delta_t} S')
+        
         observations.append(result)
-
+        
     observations=np.array(observations)
-    #print(f'Shape of the result array is {observations.shape}')
     return observations
 
