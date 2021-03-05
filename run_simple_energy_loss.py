@@ -45,7 +45,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         'exponent_inel':params[1],
         'exponent_el':params[2],
         'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins),
-        'scale_inel':params[3]
+        'scale_inel':params[3],
         'scale_el':params[4]
         }
 
@@ -74,12 +74,9 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         ######################################################
 
         
-
         K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel : (1.+np.power(T/scale_inel,exponent_inel))
         K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el : (1.+np.power(T/scale_el,exponent_el))
-
         energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, mD_factor=mD_factor, K_factor_fct_inel=K_factor_fct_inel, K_factor_fct_elastic=K_factor_fct_elastic)
-
         #######################################################
         ############## Parton energy loss solver ##############
         #######################################################
