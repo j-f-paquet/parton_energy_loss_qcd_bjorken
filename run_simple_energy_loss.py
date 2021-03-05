@@ -44,7 +44,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         'T_final_in_GeV':0.15,
         'alpha_s':params[0],
         'N_f':0,
-        'mD_factor':0.5,
+        'mD_factor':1.0,
         'exponent_inel':params[1],
         'exponent_el':params[2],
         'RAA_pT_binnings':np.linspace(p_min, p_max, num_p_bins),
