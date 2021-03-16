@@ -136,7 +136,12 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         R_AA binned according to the momentem range speceifed at the input
 
     """
-    observations = [simulate(ii,params) for ii, params in enumerate(design_matrix)]
+    
+    # Evaluate simulation at validation points
+
+    cores = 4
+    observations = Parallel(n_jobs=cores)(delayed(simulate)(ii,params) for ii, params in enumerate(design_matrix))
+#     observations = [simulate(ii,params) for ii, params in enumerate(design_matrix)]
     observations=np.array(observations)
     return observations
 
