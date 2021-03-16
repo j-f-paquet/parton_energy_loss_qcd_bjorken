@@ -137,8 +137,8 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
     """
     
     # Evaluate simulation at validation points
-
+    simulate_run = lambda ii, params: simulate(ii, params, p_min=p_min, p_max=p_max, num_p_bins=num_p_bins)
     cores = 4
-    observations = Parallel(n_jobs=cores)(delayed(simulate)(ii,params) for ii, params in enumerate(design_matrix))
+    observations = Parallel(n_jobs=cores)(delayed(simulate_run)(ii,params) for ii, params in enumerate(design_matrix))
     observations=np.array(observations)
     return observations
