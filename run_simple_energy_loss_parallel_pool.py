@@ -37,8 +37,8 @@ def P_g_tau0(p):
     p0=1.75
     return np.power(p0*p0+p*p,-5.)
 
-def simulate(params, p_min=1, p_max=20, num_p_bins=20):
-    #print(f'Working on design {i+1}')
+def simulate(i, params, p_min=1, p_max=10, num_p_bins=10):
+    print(f'Working on design {i+1}')
     start_time = time.time()
 
     signal.alarm(600) # time out after 10 minutes
@@ -125,7 +125,7 @@ def simulate(params, p_min=1, p_max=20, num_p_bins=20):
         signal.alarm(0)
 
 
-def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
+def run_simulation(design_matrix, p_min=1, p_max=10, num_p_bins=10):
     """Simulate energy loss of a jet for each design point
 
     parameters
@@ -145,7 +145,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
     if par:
         with Pool(n_cpu) as pool:
             st = time.time()
-            obs_matrix=pool.map(simulate, design_matrix)
+            obs_matrix=pool.starmap(simulate, [(ii,params, p_min, p_max, num_p_bins) for ii, params in enumerate(design_matrix)])
             et = time.time()
         print(f'Total run time for the simulations {(et-st)/60:.2f} minutes')
         #cores = 5
