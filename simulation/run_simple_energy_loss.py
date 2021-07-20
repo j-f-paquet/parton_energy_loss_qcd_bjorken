@@ -7,10 +7,10 @@ import scipy #.optimize
 import scipy.interpolate
 import scipy.integrate
 
-from temperature_profile import brick_profile, Bjorken_hydro_profile
-from parton_emission_rates import energy_loss_rates
-from solver_euler import parton_evolution_solver_euler
-from solver_rk import parton_evolution_solver_rk
+from .temperature_profile import brick_profile, Bjorken_hydro_profile
+from .parton_emission_rates import energy_loss_rates
+from .solver_euler import parton_evolution_solver_euler
+from .solver_rk import parton_evolution_solver_rk
 
 import time
 from joblib import Parallel, delayed
@@ -135,7 +135,7 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         R_AA binned according to the momentem range speceifed at the input
 
     """
-    par = True # Run in parallel
+    par = False # Do not run in parallel
     # Evaluate simulation at validation points
     simulate_run = lambda ii, params: simulate(ii, params, p_min=p_min, p_max=p_max, num_p_bins=num_p_bins)
     if par:
@@ -143,6 +143,6 @@ def run_simulation(design_matrix, p_min=1, p_max=20, num_p_bins=20):
         observations = Parallel(n_jobs=cores)(delayed(simulate_run)(ii,params) for ii, params in enumerate(design_matrix))
     else:
         observations = [simulate_run(ii,params) for ii, params in enumerate(design_matrix)]
-    
+        
     observations=np.array(observations)
     return observations

@@ -8,8 +8,8 @@ import scipy.interpolate
 import scipy.integrate
 #import scipy.integrate.simpson
 
-from eos import cs2_qcd_fct
-from bjorken_ns_solver import init_bjorken_ns_solver, approx_effective_viscosity_ns, better_effective_viscosity_ns
+from .eos import cs2_qcd_fct
+from .bjorken_ns_solver import init_bjorken_ns_solver, approx_effective_viscosity_ns, better_effective_viscosity_ns
 
 hbarc=0.1973
 

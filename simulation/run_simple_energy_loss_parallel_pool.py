@@ -7,10 +7,10 @@ import scipy #.optimize
 import scipy.interpolate
 import scipy.integrate
 
-from temperature_profile import brick_profile, Bjorken_hydro_profile
-from parton_emission_rates import energy_loss_rates
-from solver_euler import parton_evolution_solver_euler
-from solver_rk import parton_evolution_solver_rk
+from .temperature_profile import brick_profile, Bjorken_hydro_profile
+from .parton_emission_rates import energy_loss_rates
+from .solver_euler import parton_evolution_solver_euler
+from .solver_rk import parton_evolution_solver_rk
 
 import multiprocessing
 from multiprocessing import Pool
@@ -32,7 +32,7 @@ signal.signal(signal.SIGALRM, timeout_handler)
 
 hbarc=0.1973
 
-# Initial conditions 
+# Initial conditions
 def P_g_tau0(p):
     p0=1.75
     return np.power(p0*p0+p*p,-5.)
@@ -86,9 +86,9 @@ def simulate(i, params, p_min=1, p_max=10, num_p_bins=10):
 
         K_factor_fct_inel=lambda T, scale_inel=scale_inel, exponent_inel=exponent_inel: (1.+np.power(T/scale_inel,exponent_inel))
         K_factor_fct_elastic=lambda T, scale_el=scale_el, exponent_el=exponent_el: (1.+np.power(T/scale_el,exponent_el))
-        
+
         energy_loss_rate=energy_loss_rates(alpha_s = alpha_s, N_f=N_f, mD_factor=mD_factor, K_factor_fct_inel=K_factor_fct_inel, K_factor_fct_elastic=K_factor_fct_elastic)
-        
+
         #######################################################
         ############## Parton energy loss solver ##############
         #######################################################
@@ -98,10 +98,10 @@ def simulate(i, params, p_min=1, p_max=10, num_p_bins=10):
         num_p_solver=num_p_bins
         pmin_solver=p_min
         pmax_solver=p_max
-        
+
         #parton_evolution_solver=parton_evolution_solver_euler(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=num_p_solver, pmin=pmin_solver, pmax=pmax_solver)
         #P_final_fct=parton_evolution_solver.evolve_to_min_temperature(dtau=dtau_adaptive, T_min_in_GeV=T_final_in_GeV, use_adaptive_timestep=True)
-        
+
         parton_evolution_solver=parton_evolution_solver_rk(initial_condition_fct=P_g_tau0, tau0=tau0, T_profile=T_profile, energy_loss_rate=energy_loss_rate, num_p=num_p_solver, pmin=pmin_solver, pmax=pmax_solver)
         P_final_fct=parton_evolution_solver.evolve_to_min_temperature(T_min_in_GeV=T_final_in_GeV)
 
@@ -153,6 +153,6 @@ def run_simulation(design_matrix, p_min=1, p_max=10, num_p_bins=10):
         observations = obs_matrix
     else:
         observations = [simulate_run(ii,params) for ii, params in enumerate(design_matrix)]
-    
+
     observations=np.array(observations)
     return observations

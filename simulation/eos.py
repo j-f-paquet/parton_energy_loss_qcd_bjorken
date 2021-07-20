@@ -11,7 +11,7 @@ hbarc=0.1973
 # Load EOS from MUSIC (generated with https://github.com/j-f-paquet/eos_maker - SMASH branch )
 #eos_location="./music/EOS/hotQCD/hrg_hotqcd_eos_binary.dat"
 #eos_location="/home/jp401/Dropbox/work/my_papers/effective_visc_bjorken/results/bjorken_relax/music/EOS/hotQCD/hrg_hotqcd_eos_binary.dat"
-eos_location="./hrg_hotqcd_eos_binary.dat"
+eos_location="simulation/hrg_hotqcd_eos_binary.dat"
 
 raw=np.fromfile(eos_location, dtype=(float,4))
 
