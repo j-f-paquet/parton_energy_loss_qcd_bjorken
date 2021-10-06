@@ -18,7 +18,7 @@ class contourWeightedEI(Acquisition):
     This acquisition is extended from Sequential Experimental Design for
     Contour Estimation (Ranjan et al. 2008). It works for multiple output problem. It has not taken the noise of experimental data into account yet.
     """
-    def __init__(self, multioutputmodelwrapper, a_list, alpha_list, w_list) -> None:
+    def __init__(self, models, a_list, alpha_list, w_list) -> None:
 
         """
         :param multioutputmodelwrapper: One model for multiple inputs and multiple outputs, combining multiple independent models
@@ -26,7 +26,7 @@ class contourWeightedEI(Acquisition):
         :param alpha_list: Control the sampling of the regions with highest variance, one for each observable
         :param w_list: Weights of EI put on each observable
         """
-        self.multioutputmodelwrapper = multioutputmodelwrapper
+        self.models = models
         self.a_list = a_list
         self.alpha_list = alpha_list
         self.w_list = w_list
@@ -39,8 +39,8 @@ class contourWeightedEI(Acquisition):
         
         # save predictive means and variances of all observables in 2 dictionaries
         m_dict = dict(); s2_dict = dict()
-        for i in range(len(self.model_list)):
-            m_vec, s2_vec = multioutputmodelwrapper.predict(x)[i] # the last index tells which model to predict
+        for i in range(len(a_list)):
+            m_vec, s2_vec = models.predict(x)[i] # the last index tells which model to predict
             m_dict[i] = m_vec; s2_dict[i] = s2_vec
 
         f_acqu_x = []
