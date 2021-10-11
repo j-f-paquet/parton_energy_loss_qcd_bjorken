@@ -40,7 +40,8 @@ class contourWeightedEI(Acquisition):
         # save predictive means and variances of all observables in 2 dictionaries
         m_dict = dict(); s2_dict = dict()
         for i in range(len(a_list)):
-            m_vec, s2_vec = models.predict(x)[i] # the last index tells which model to predict
+            m_vec = models.predict(x)[0][i]
+            s2_vec = models.predict(x)[1][i]
             m_dict[i] = m_vec; s2_dict[i] = s2_vec
 
         f_acqu_x = []
