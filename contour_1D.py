@@ -33,7 +33,7 @@ class contour1D(Acquisition):
             f = lambda y: (y-m)**2 * norm.pdf((y-m)/s) # integrand for the third term
             f_acqu_x_temp = ((alpha**2 * s2) - (m-a)**2) * (norm.cdf((a-m)/s+alpha) - norm.cdf((a-m)/s-alpha)) \
                     + 2*(m-a)*s2 * (norm.pdf((a-m)/s+alpha) - norm.pdf((a-m)/s-alpha)) \
-                    + integrate.quad(f, a-alpha*s, a+alpha*s)[0]
+                    - integrate.quad(f, a-alpha*s, a+alpha*s)[0]
             f_acqu_x.append(f_acqu_x_temp)
 
         f_acqu_x = np.array(f_acqu_x); f_acqu_x = f_acqu_x.reshape(-1,1)
