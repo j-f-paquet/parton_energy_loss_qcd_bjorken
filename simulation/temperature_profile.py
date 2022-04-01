@@ -8,8 +8,8 @@ import scipy.interpolate
 import scipy.integrate
 #import scipy.integrate.simpson
 
-from .eos import cs2_qcd_fct
-from .bjorken_ns_solver import init_bjorken_ns_solver, approx_effective_viscosity_ns, better_effective_viscosity_ns
+from eos import cs2_qcd_fct
+from bjorken_ns_solver import init_bjorken_ns_solver, approx_effective_viscosity_ns, better_effective_viscosity_ns
 
 hbarc=0.1973
 
@@ -63,43 +63,43 @@ class Bjorken_hydro_profile:
 
 
 ###################################################
-########### Plot the temperature profile ##########
-###################################################
+# ########## Plot the temperature profile ##########
+# ##################################################
 #
-#T0_in_GeV=.400
-#tau0=0.5
+# T0_in_GeV=.400
+# tau0=0.5
 #
-#T_brick_fct=brick_profile(T0_in_GeV=T0_in_GeV)
-#T_ns_fct=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
+# T_brick_fct=brick_profile(T0_in_GeV=T0_in_GeV)
+# T_ns_fct=Bjorken_hydro_profile(T0_in_GeV=T0_in_GeV, tau0=tau0)
 #
-#tau_plot=10.
+# tau_plot=10.
 #
-#plt.figure()
-#plt.axes().xaxis.set_minor_locator(AutoMinorLocator())
-##plt.yticks([])
-##plt.axes().yaxis.set_minor_formatter(NullFormatter())
-##plt.axes().yaxis.set_major_formatter(mtick.FormatStrFormatter('%.2f'))
-#plt.gca().yaxis.set_ticks_position('both')
-#plt.axes().yaxis.set_minor_locator(AutoMinorLocator())
+# plt.figure()
+# plt.axes().xaxis.set_minor_locator(AutoMinorLocator())
+# #plt.yticks([])
+# #plt.axes().yaxis.set_minor_formatter(NullFormatter())
+# #plt.axes().yaxis.set_major_formatter(mtick.FormatStrFormatter('%.2f'))
+# plt.gca().yaxis.set_ticks_position('both')
+# plt.axes().yaxis.set_minor_locator(AutoMinorLocator())
 #
-#plt.xlim(tau0,tau_plot)
-#plt.ylim(.1,1.5*T0_in_GeV)
-##plt.xscale('log')
-##plt.yscale('log')
-##plt.yticks(np.arange(0.,0.3,.05))
+# plt.xlim(tau0,tau_plot)
+# plt.ylim(.1,1.5*T0_in_GeV)
+# #plt.xscale('log')
+# #plt.yscale('log')
+# #plt.yticks(np.arange(0.,0.3,.05))
 #
-#plt.xlabel(r'$\tau$ (fm)')
-#plt.ylabel(r"$T$ (GeV)")
+# plt.xlabel(r'$\tau$ (fm)')
+# plt.ylabel(r"$T$ (GeV)")
 #
-## Plot the exact solution
-#tau_range=np.arange(tau0,tau_plot,(tau_plot-tau0)/100)
-#T_from_brick= np.array(list(map(T_brick_fct.get_T,tau_range)))
-#plt.plot(tau_range, T_from_brick,"-",color='red',label="", linewidth=3)
-#T_from_ns= np.array(list(map(T_ns_fct.get_T,tau_range)))
-#plt.plot(tau_range, T_from_ns,"--",color='blue',label="", linewidth=3)
+# # Plot the exact solution
+# tau_range=np.arange(tau0,tau_plot,(tau_plot-tau0)/100)
+# T_from_brick= np.array(list(map(T_brick_fct.get_T,tau_range)))
+# plt.plot(tau_range, T_from_brick,"-",color='red',label="", linewidth=3)
+# T_from_ns= np.array(list(map(T_ns_fct.get_T,tau_range)))
+# plt.plot(tau_range, T_from_ns,"--",color='blue',label="", linewidth=3)
 #
-#plt.legend()
-#plt.tight_layout()
-#plt.savefig("T_profile.pdf")
-#plt.show()
+# plt.legend()
+# plt.tight_layout()
+# plt.savefig("T_profile.pdf")
+# plt.show()
 #

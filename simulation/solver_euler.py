@@ -3,14 +3,14 @@ import scipy
 import scipy.interpolate
 import scipy.integrate
 
-from .temperature_profile import brick_profile, Bjorken_hydro_profile
-from .parton_emission_rates import energy_loss_rates
+from temperature_profile import brick_profile, Bjorken_hydro_profile
+from parton_emission_rates import energy_loss_rates
 
 hbarc=0.1973
 
 ##############################################
-############## Parton evolution ##############
-##############################################
+# ############# Parton evolution ##############
+# #############################################
 
 # Input: 
 # - initial conditions

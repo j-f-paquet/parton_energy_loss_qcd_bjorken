@@ -7,10 +7,10 @@ import scipy #.optimize
 import scipy.interpolate
 import scipy.integrate
 
-from .temperature_profile import brick_profile, Bjorken_hydro_profile
-from .parton_emission_rates import energy_loss_rates
-from .solver_euler import parton_evolution_solver_euler
-from .solver_rk import parton_evolution_solver_rk
+from temperature_profile import brick_profile, Bjorken_hydro_profile
+from parton_emission_rates import energy_loss_rates
+from solver_euler import parton_evolution_solver_euler
+from solver_rk import parton_evolution_solver_rk
 
 import time
 from joblib import Parallel, delayed
